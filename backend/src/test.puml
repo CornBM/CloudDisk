@@ -1,0 +1,107 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam classFontSize 12
+skinparam classFontName Arial
+skinparam maxMessageSize 100
+left to right direction
+
+class FileService {
+    - FileMapper fileMapper
+    - ShareMapper shareMapper
+    - UserMapper userMapper
+    - String root
+    - String temp
+    - FileUtils f
+    + file(String id, String path) Response
+    + upload(List<MultipartFile> files, String id, String path) Response
+    + download(String id, String path, String category) ResponseEntity
+    + delete(String id, List<String> path) Response
+    + rename(String id, String path, String name) Response
+    + mkdir(String id, String path, String name) Response
+    + copy(String id, List<String> path) Response
+    + move(String id, List<String> path) Response
+    + search(String id, String name, String path, String category) Response
+    + share(String id, String path, List<String> names) Response
+    + cancelShare(String id, String path, List<String> names) Response
+    + searchShare(String id, String fileName, String userName) Response
+}
+
+class FileController {
+    - FileService fileService
+    - UserMapper userMapper
+    + upload(MultipartHttpServletRequest, String path) Response
+    + download(HttpServletRequest, FileParams) ResponseEntity
+    + file(HttpServletRequest, FileParams) Response
+    + delete(HttpServletRequest, FileParams) Response
+    + rename(HttpServletRequest, FileParams) Response
+    + mkdir(HttpServletRequest, FileParams) Response
+    + copy(HttpServletRequest, FileParams) Response
+    + move(HttpServletRequest, FileParams) Response
+    + search(HttpServletRequest, FileParams) Response
+    + share(HttpServletRequest, FileParams) Response
+    + unshare(HttpServletRequest, FileParams) Response
+    + searchShare(HttpServletRequest, FileParams) Response
+    + downloadShare(HttpServletRequest, FileParams) ResponseEntity
+}
+
+class FileMapper {
+    + updateNameByKey() int
+    + updatePathByKey() int
+    + updateTypeByKey() int
+    + selectByDoubleName() List<FileItem>
+    + selectByKey() List<FileItem>
+}
+
+class ShareMapper {
+    + insert(Share) void
+    + delete(QueryWrapper) void
+}
+
+class UserMapper {
+    + selectById(String) User
+    + findByUsername(String) User
+}
+
+class FileItem {
+    - String name
+    - String path
+    - String type
+    - String user_name
+}
+
+class Response {
+    - int code
+    - String message
+    - Object data
+}
+
+class FileParams {
+    - String path
+    - String name
+    - List<String> pathList
+    - String category
+    - String user_name
+}
+
+class User {
+    - String id
+    - String accountName
+}
+
+class FileUtils {
+    - String root
+    - String temp
+    - FileMapper fileMapper
+    + getItemFromFile(Integer userId, File file, String path, boolean isUpload) FileItem
+}
+
+FileService -right-> FileMapper
+FileService -right-> ShareMapper
+FileService -right-> UserMapper
+FileService -down-> Response
+FileService -right-> FileUtils
+
+FileController -right-> FileService
+FileController -down-> Response
+
+@enduml
